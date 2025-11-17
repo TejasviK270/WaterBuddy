@@ -2,8 +2,6 @@
 
 import streamlit as st
 import random
-import tkinter as tk
-from threading import Timer
 
 # ------------------ Setup ------------------
 st.set_page_config(page_title="WaterBuddy", layout="centered")
@@ -48,10 +46,8 @@ st.session_state.age_group = age_group
 # ------------------ Show Standard vs User Goal ------------------
 st.markdown("### 🎯 Hydration Goals")
 col1, col2 = st.columns(2)
-with col1:
-    st.metric("Standard Goal", f"{standard_goal} ml")
-with col2:
-    st.metric("Your Goal", f"{adjusted_goal} ml")
+col1.metric("Standard Goal", f"{standard_goal} ml")
+col2.metric("Your Goal", f"{adjusted_goal} ml")
 
 # ------------------ Unit Converter ------------------
 st.markdown("### 🔄 Unit Converter")
@@ -109,6 +105,10 @@ if st.button("📅 End-of-Day Summary"):
     st.balloons()
     st.success(f"Today you drank {total} ml of water. Great job staying hydrated!")
 
+# ------------------ Reminder Simulation ------------------
+if st.button("🔔 Trigger Hydration Reminder"):
+    st.toast("💧 Time to drink water!", icon="💧")
+
 # ------------------ Dark/Light Mode Toggle ------------------
 theme = st.radio("🌓 Choose Theme:", ["Light", "Dark"])
 if theme == "Dark":
@@ -120,15 +120,3 @@ if theme == "Dark":
         """,
         unsafe_allow_html=True
     )
-
-# ------------------ Tkinter Hydration Reminder ------------------
-def show_reminder():
-    root = tk.Tk()
-    root.title("Hydration Reminder")
-    label = tk.Label(root, text="💧 Time to drink water!", font=("Arial", 18), padx=20, pady=20)
-    label.pack()
-    root.after(3000, root.destroy)  # Auto-close after 3 seconds
-    root.mainloop()
-
-if st.button("🔔 Trigger Hydration Reminder"):
-    Timer(1, show_reminder).start()

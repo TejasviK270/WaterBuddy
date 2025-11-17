@@ -132,6 +132,3 @@ def show_reminder():
 
 if st.button("🔔 Trigger Hydration Reminder"):
     Timer(1, show_reminder).start()
-    """,
-        unsafe_allow_html=True
-    )

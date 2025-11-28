@@ -27,7 +27,7 @@ init_state()
 
 # ------------------ Navigation Helpers ------------------
 def go_next():
-    st.session_state.screen = min(st.session_state.screen + 1, 5)
+    st.session_state.screen = min(st.session_state.screen + 1, 2)  # only 0,1,2 now
 
 def go_prev():
     st.session_state.screen = max(st.session_state.screen - 1, 0)
@@ -38,8 +38,7 @@ if st.session_state.screen == 0:
     st.write("Welcome! Let's start your hydration journey.")
     st.info("💡 Tip of the Day: " + random.choice(st.session_state.tips))
 
-    # Use a simple form so navigation only happens on submit
-    with st.form("home_form", clear_on_submit=False):
+    with st.form("home_form"):
         next_pressed = st.form_submit_button("➡️ Next")
     if next_pressed:
         go_next()
@@ -55,72 +54,47 @@ elif st.session_state.screen == 1:
         "Seniors (65+ yrs)": 2000
     }
 
-    # Show a form; values only commit when submitted
-    with st.form("goals_form", clear_on_submit=False):
-        # Prepopulate temporary inputs from session if available, else defaults
-        default_age = st.session_state.age_group if st.session_state.age_group in age_groups else "Adults (14–64 yrs)"
-        age_group_choice = st.selectbox(
-            "Choose your age group:", list(age_groups.keys()),
-            index=list(age_groups.keys()).index(default_age),
-            key="tmp_age_group_choice"
-        )
-
+    with st.form("goals_form"):
+        age_group_choice = st.selectbox("Choose your age group:", list(age_groups.keys()))
         standard_goal = age_groups[age_group_choice]
-        default_goal = st.session_state.goal if st.session_state.goal > 0 else standard_goal
-        adjusted_goal_choice = st.number_input(
-            "Suggested goal (ml):", value=int(default_goal), step=100, key="tmp_goal_choice"
-        )
+        adjusted_goal_choice = st.number_input("Suggested goal (ml):", value=standard_goal, step=100)
 
         col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Standard Goal", f"{standard_goal} ml")
-        with col2:
-            st.metric("Your Goal", f"{adjusted_goal_choice} ml")
+        col1.metric("Standard Goal", f"{standard_goal} ml")
+        col2.metric("Your Goal", f"{adjusted_goal_choice} ml")
 
-        colA, colB = st.columns(2)
-        with colA:
-            back_pressed = st.form_submit_button("⬅️ Back")
-        with colB:
-            save_next_pressed = st.form_submit_button("💾 Save & ➡️ Next")
+        back_pressed = st.form_submit_button("⬅️ Back")
+        save_next_pressed = st.form_submit_button("💾 Save & ➡️ Next")
 
-    # Handle navigation only after submit
     if back_pressed:
-        # Do not change saved session data; just go back
         go_prev()
     if save_next_pressed:
-        # Commit choices to session state, then go next
         st.session_state.age_group = age_group_choice
         st.session_state.goal = int(adjusted_goal_choice)
         go_next()
 
-# ------------------ Screen 2: Log Intake ------------------
+# ------------------ Screen 2: Log Intake + Progress + Mascot ------------------
 elif st.session_state.screen == 2:
     st.subheader("🚰 Log Your Water Intake")
 
-    with st.form("log_form", clear_on_submit=False):
-        log_amount = st.number_input("Enter amount (ml):", value=250, step=50, key="tmp_log_amount")
+    with st.form("log_form"):
+        log_amount = st.number_input("Enter amount (ml):", value=250, step=50)
         add_pressed = st.form_submit_button("➕ Add Water")
         reset_pressed = st.form_submit_button("🔄 Reset")
-
-        colA, colB = st.columns(2)
-        with colA:
-            back_pressed = st.form_submit_button("⬅️ Back")
-        with colB:
-            next_pressed = st.form_submit_button("➡️ Next")
+        back_pressed = st.form_submit_button("⬅️ Back")
+        restart_pressed = st.form_submit_button("🔄 Restart")
 
     if add_pressed:
         st.session_state.total_intake += int(log_amount)
     if reset_pressed:
         st.session_state.total_intake = 0
-    st.write(f"💧 Total Intake so far: {st.session_state.total_intake} ml")
-
     if back_pressed:
         go_prev()
-    if next_pressed:
-        go_next()
+    if restart_pressed:
+        st.session_state.screen = 0
+        st.session_state.total_intake = 0
 
-# ------------------ Screen 3: Progress ------------------
-elif st.session_state.screen == 3:
+    # --- Progress Bar ---
     goal = st.session_state.goal
     total = st.session_state.total_intake
     remaining = max(goal - total, 0)
@@ -132,24 +106,7 @@ elif st.session_state.screen == 3:
     st.write(f"📉 Remaining: {remaining} ml")
     st.write(f"📈 Progress: {progress:.1f}%")
 
-    with st.form("progress_form", clear_on_submit=False):
-        colA, colB = st.columns(2)
-        with colA:
-            back_pressed = st.form_submit_button("⬅️ Back")
-        with colB:
-            next_pressed = st.form_submit_button("➡️ Next")
-
-    if back_pressed:
-        go_prev()
-    if next_pressed:
-        go_next()
-
-# ------------------ Screen 4: Mascot ------------------
-elif st.session_state.screen == 4:
-    goal = st.session_state.goal
-    total = st.session_state.total_intake
-    progress = min((total / goal) * 100, 100) if goal > 0 else 0
-
+    # --- Mascot Reaction ---
     st.subheader("🐢 Turtle Mascot Reaction")
     if goal == 0:
         st.warning("Set a goal first on the Goals screen.")
@@ -166,36 +123,3 @@ elif st.session_state.screen == 4:
         else:
             st.success("🎉 Fantastic! You've reached your hydration goal!")
             st.markdown("🐢 Turtle Mascot: 😄 Clapping with joy!")
-
-    with st.form("mascot_form", clear_on_submit=False):
-        colA, colB = st.columns(2)
-        with colA:
-            back_pressed = st.form_submit_button("⬅️ Back")
-        with colB:
-            next_pressed = st.form_submit_button("➡️ Next")
-
-    if back_pressed:
-        go_prev()
-    if next_pressed:
-        go_next()
-
-# ------------------ Screen 5: Summary ------------------
-elif st.session_state.screen == 5:
-    total = st.session_state.total_intake
-    st.subheader("📅 End-of-Day Summary")
-    st.balloons()
-    st.success(f"Today you drank {total} ml of water. Great job staying hydrated!")
-
-    with st.form("summary_form", clear_on_submit=False):
-        colA, colB = st.columns(2)
-        with colA:
-            back_pressed = st.form_submit_button("⬅️ Back")
-        with colB:
-            restart_pressed = st.form_submit_button("🔄 Restart")
-
-    if back_pressed:
-        go_prev()
-    if restart_pressed:
-        # Reset to beginning and clear intake
-        st.session_state.screen = 0
-        st.session_state.total_intake = 0

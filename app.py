@@ -27,10 +27,16 @@ init_state()
 
 # ------------------ Navigation Helpers ------------------
 def go_next():
-    st.session_state.screen = min(st.session_state.screen + 1, 2)  # only 0,1,2 now
+    st.session_state.screen = min(st.session_state.screen + 1, 2)
 
 def go_prev():
     st.session_state.screen = max(st.session_state.screen - 1, 0)
+
+def reset_day():
+    st.session_state.screen = 0
+    st.session_state.total_intake = 0
+    st.session_state.goal = 0
+    st.session_state.age_group = None
 
 # ------------------ Screen 0: Home ------------------
 if st.session_state.screen == 0:
@@ -80,9 +86,9 @@ elif st.session_state.screen == 2:
     with st.form("log_form"):
         log_amount = st.number_input("Enter amount (ml):", value=250, step=50)
         add_pressed = st.form_submit_button("➕ Add Water")
-        reset_pressed = st.form_submit_button("🔄 Reset")
+        reset_pressed = st.form_submit_button("🔄 Reset Intake")
         back_pressed = st.form_submit_button("⬅️ Back")
-        restart_pressed = st.form_submit_button("🔄 Restart")
+        reset_day_pressed = st.form_submit_button("🌅 Reset Day")
 
     if add_pressed:
         st.session_state.total_intake += int(log_amount)
@@ -90,9 +96,8 @@ elif st.session_state.screen == 2:
         st.session_state.total_intake = 0
     if back_pressed:
         go_prev()
-    if restart_pressed:
-        st.session_state.screen = 0
-        st.session_state.total_intake = 0
+    if reset_day_pressed:
+        reset_day()
 
     # --- Progress Bar ---
     goal = st.session_state.goal

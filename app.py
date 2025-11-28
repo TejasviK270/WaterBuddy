@@ -76,7 +76,7 @@ elif st.session_state.screen == 2:
     if st.button("⬅️ Back"):
         prev_screen()
     if st.button("➡️ Next"):
-        next_screen()
+        
 
 # ------------------ Screen 3: Progress ------------------
 elif st.session_state.screen == 3:

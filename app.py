@@ -7,6 +7,8 @@ import random
 st.set_page_config(page_title="WaterBuddy", layout="centered")
 
 # ------------------ Session State Init ------------------
+if "screen" not in st.session_state:
+    st.session_state.screen = 0
 if "total_intake" not in st.session_state:
     st.session_state.total_intake = 0
 if "goal" not in st.session_state:
@@ -22,23 +24,24 @@ if "tips" not in st.session_state:
         "Use a hydration reminder app."
     ]
 
-# ------------------ Sidebar Navigation ------------------
-st.sidebar.title("📑 Navigation")
-screen = st.sidebar.radio(
-    "Go to:",
-    ["🏠 Home", "🎯 Goals", "🚰 Log Intake", "📊 Progress", "🐢 Mascot", "🔄 Converter", "📅 Summary"]
-)
+# ------------------ Helper Functions ------------------
+def next_screen():
+    st.session_state.screen += 1
 
-# ------------------ Home Screen ------------------
-if screen == "🏠 Home":
+def prev_screen():
+    st.session_state.screen -= 1
+
+# ------------------ Screen 0: Home ------------------
+if st.session_state.screen == 0:
     st.title("💧 WaterBuddy: Your Daily Hydration Companion")
-    st.write("Welcome! Use the sidebar to navigate through the app.")
-    st.sidebar.write("💡 Tip of the Day:")
-    st.sidebar.info(random.choice(st.session_state.tips))
+    st.write("Welcome! Let's start your hydration journey.")
+    st.info("💡 Tip of the Day: " + random.choice(st.session_state.tips))
+    if st.button("➡️ Next"):
+        next_screen()
 
-# ------------------ Goals Screen ------------------
-elif screen == "🎯 Goals":
-    st.subheader("👤 Select Your Age Group")
+# ------------------ Screen 1: Goals ------------------
+elif st.session_state.screen == 1:
+    st.subheader("🎯 Set Your Hydration Goal")
     age_groups = {
         "Children (4–8 yrs)": 1200,
         "Teens (9–13 yrs)": 1700,
@@ -55,8 +58,13 @@ elif screen == "🎯 Goals":
     col1.metric("Standard Goal", f"{standard_goal} ml")
     col2.metric("Your Goal", f"{adjusted_goal} ml")
 
-# ------------------ Log Intake Screen ------------------
-elif screen == "🚰 Log Intake":
+    if st.button("⬅️ Back"):
+        prev_screen()
+    if st.button("➡️ Next"):
+        next_screen()
+
+# ------------------ Screen 2: Log Intake ------------------
+elif st.session_state.screen == 2:
     st.subheader("🚰 Log Your Water Intake")
     log_amount = st.number_input("Enter amount (ml):", value=250, step=50)
     if st.button("➕ Add Water"):
@@ -65,8 +73,13 @@ elif screen == "🚰 Log Intake":
         st.session_state.total_intake = 0
     st.write(f"💧 Total Intake so far: {st.session_state.total_intake} ml")
 
-# ------------------ Progress Screen ------------------
-elif screen == "📊 Progress":
+    if st.button("⬅️ Back"):
+        prev_screen()
+    if st.button("➡️ Next"):
+        next_screen()
+
+# ------------------ Screen 3: Progress ------------------
+elif st.session_state.screen == 3:
     goal = st.session_state.goal
     total = st.session_state.total_intake
     remaining = max(goal - total, 0)
@@ -78,8 +91,13 @@ elif screen == "📊 Progress":
     st.write(f"📉 Remaining: {remaining} ml")
     st.write(f"📈 Progress: {progress:.1f}%")
 
-# ------------------ Mascot Screen ------------------
-elif screen == "🐢 Mascot":
+    if st.button("⬅️ Back"):
+        prev_screen()
+    if st.button("➡️ Next"):
+        next_screen()
+
+# ------------------ Screen 4: Mascot ------------------
+elif st.session_state.screen == 4:
     goal = st.session_state.goal
     total = st.session_state.total_intake
     progress = min((total / goal) * 100, 100) if goal > 0 else 0
@@ -96,4 +114,22 @@ elif screen == "🐢 Mascot":
         st.markdown("🐢 Turtle Mascot: 😊 Smiling and cheering you on!")
     else:
         st.success("🎉 Fantastic! You've reached your hydration goal!")
-       
+        st.markdown("🐢 Turtle Mascot: 😄 Clapping with joy!")
+
+    if st.button("⬅️ Back"):
+        prev_screen()
+    if st.button("➡️ Next"):
+        next_screen()
+
+# ------------------ Screen 5: Summary ------------------
+elif st.session_state.screen == 5:
+    total = st.session_state.total_intake
+    st.subheader("📅 End-of-Day Summary")
+    st.balloons()
+    st.success(f"Today you drank {total} ml of water. Great job staying hydrated!")
+
+    if st.button("⬅️ Back"):
+        prev_screen()
+    if st.button("🔄 Restart"):
+        st.session_state.screen = 0
+        st.session_state.total_intake = 0

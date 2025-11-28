@@ -48,19 +48,22 @@ elif st.session_state.screen == 1:
         "Adults (14–64 yrs)": 2500,
         "Seniors (65+ yrs)": 2000
     }
-    age_group = st.selectbox("Choose your age group:", list(age_groups.keys()))
-    standard_goal = age_groups[age_group]
-    adjusted_goal = st.number_input("Suggested goal (ml):", value=standard_goal, step=100)
-    st.session_state.goal = adjusted_goal
-    st.session_state.age_group = age_group
+
+    # Temporary variables (not saved until Next is pressed)
+    age_group_choice = st.selectbox("Choose your age group:", list(age_groups.keys()))
+    standard_goal = age_groups[age_group_choice]
+    adjusted_goal_choice = st.number_input("Suggested goal (ml):", value=standard_goal, step=100)
 
     col1, col2 = st.columns(2)
     col1.metric("Standard Goal", f"{standard_goal} ml")
-    col2.metric("Your Goal", f"{adjusted_goal} ml")
+    col2.metric("Your Goal", f"{adjusted_goal_choice} ml")
 
     if st.button("⬅️ Back"):
         prev_screen()
     if st.button("➡️ Next"):
+        # Save values only when Next is clicked
+        st.session_state.age_group = age_group_choice
+        st.session_state.goal = adjusted_goal_choice
         next_screen()
 
 # ------------------ Screen 2: Log Intake ------------------
@@ -76,7 +79,7 @@ elif st.session_state.screen == 2:
     if st.button("⬅️ Back"):
         prev_screen()
     if st.button("➡️ Next"):
-        
+        next_screen()
 
 # ------------------ Screen 3: Progress ------------------
 elif st.session_state.screen == 3:

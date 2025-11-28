@@ -1,5 +1,3 @@
-# app.py
-
 import streamlit as st
 import random
 
@@ -29,13 +27,15 @@ def next_screen():
     st.session_state.screen += 1
 
 def prev_screen():
-    st.session_state.screen -= 1
+    if st.session_state.screen > 0:
+        st.session_state.screen -= 1
 
 # ------------------ Screen 0: Home ------------------
 if st.session_state.screen == 0:
     st.title("💧 WaterBuddy: Your Daily Hydration Companion")
     st.write("Welcome! Let's start your hydration journey.")
     st.info("💡 Tip of the Day: " + random.choice(st.session_state.tips))
+
     if st.button("➡️ Next"):
         next_screen()
 
@@ -49,7 +49,7 @@ elif st.session_state.screen == 1:
         "Seniors (65+ yrs)": 2000
     }
 
-    # Use temporary variables for inputs
+    # Inputs only update temporary variables
     age_group_choice = st.selectbox("Choose your age group:", list(age_groups.keys()), key="age_group_choice")
     standard_goal = age_groups[age_group_choice]
     adjusted_goal_choice = st.number_input("Suggested goal (ml):", value=standard_goal, step=100, key="goal_choice")
@@ -58,7 +58,6 @@ elif st.session_state.screen == 1:
     col1.metric("Standard Goal", f"{standard_goal} ml")
     col2.metric("Your Goal", f"{adjusted_goal_choice} ml")
 
-    # Navigation buttons
     colA, colB = st.columns([1,1])
     with colA:
         if st.button("⬅️ Back"):
@@ -73,17 +72,20 @@ elif st.session_state.screen == 1:
 # ------------------ Screen 2: Log Intake ------------------
 elif st.session_state.screen == 2:
     st.subheader("🚰 Log Your Water Intake")
-    log_amount = st.number_input("Enter amount (ml):", value=250, step=50)
+    log_amount = st.number_input("Enter amount (ml):", value=250, step=50, key="log_amount")
     if st.button("➕ Add Water"):
         st.session_state.total_intake += log_amount
     if st.button("🔄 Reset"):
         st.session_state.total_intake = 0
     st.write(f"💧 Total Intake so far: {st.session_state.total_intake} ml")
 
-    if st.button("⬅️ Back"):
-        prev_screen()
-    if st.button("➡️ Next"):
-        next_screen()
+    colA, colB = st.columns([1,1])
+    with colA:
+        if st.button("⬅️ Back"):
+            prev_screen()
+    with colB:
+        if st.button("➡️ Next"):
+            next_screen()
 
 # ------------------ Screen 3: Progress ------------------
 elif st.session_state.screen == 3:
@@ -98,10 +100,13 @@ elif st.session_state.screen == 3:
     st.write(f"📉 Remaining: {remaining} ml")
     st.write(f"📈 Progress: {progress:.1f}%")
 
-    if st.button("⬅️ Back"):
-        prev_screen()
-    if st.button("➡️ Next"):
-        next_screen()
+    colA, colB = st.columns([1,1])
+    with colA:
+        if st.button("⬅️ Back"):
+            prev_screen()
+    with colB:
+        if st.button("➡️ Next"):
+            next_screen()
 
 # ------------------ Screen 4: Mascot ------------------
 elif st.session_state.screen == 4:
@@ -123,10 +128,13 @@ elif st.session_state.screen == 4:
         st.success("🎉 Fantastic! You've reached your hydration goal!")
         st.markdown("🐢 Turtle Mascot: 😄 Clapping with joy!")
 
-    if st.button("⬅️ Back"):
-        prev_screen()
-    if st.button("➡️ Next"):
-        next_screen()
+    colA, colB = st.columns([1,1])
+    with colA:
+        if st.button("⬅️ Back"):
+            prev_screen()
+    with colB:
+        if st.button("➡️ Next"):
+            next_screen()
 
 # ------------------ Screen 5: Summary ------------------
 elif st.session_state.screen == 5:
@@ -135,8 +143,11 @@ elif st.session_state.screen == 5:
     st.balloons()
     st.success(f"Today you drank {total} ml of water. Great job staying hydrated!")
 
-    if st.button("⬅️ Back"):
-        prev_screen()
-    if st.button("🔄 Restart"):
-        st.session_state.screen = 0
-        st.session_state.total_intake = 0
+    colA, colB = st.columns([1,1])
+    with colA:
+        if st.button("⬅️ Back"):
+            prev_screen()
+    with colB:
+        if st.button("🔄 Restart"):
+            st.session_state.screen = 0
+            st.session_state.total_intake = 0

@@ -38,7 +38,7 @@ elif st.session_state.screen == 1:
     col2.metric("Your Goal", f"{adjusted_goal} ml")
 
     st.write("")  # spacing
-    col_prev, col_next = st.columns([1, 1)
+    col_prev, col_next = st.columns([1, 1])
     
     if col_prev.button("⬅️ Back"):
         prev_screen()

@@ -24,14 +24,17 @@ if "tips" not in st.session_state:
 
 # ------------------ Sidebar Navigation ------------------
 st.sidebar.title("📑 Navigation")
-screen = st.sidebar.radio("Go to:", ["🏠 Home", "🎯 Goals", "🚰 Log Intake", "📊 Progress", "🐢 Mascot", "📅 Summary"])
+screen = st.sidebar.radio(
+    "Go to:",
+    ["🏠 Home", "🎯 Goals", "🚰 Log Intake", "📊 Progress", "🐢 Mascot", "🔄 Converter", "📅 Summary"]
+)
 
 # ------------------ Home Screen ------------------
 if screen == "🏠 Home":
     st.title("💧 WaterBuddy: Your Daily Hydration Companion")
+    st.write("Welcome! Use the sidebar to navigate through the app.")
     st.sidebar.write("💡 Tip of the Day:")
     st.sidebar.info(random.choice(st.session_state.tips))
-    st.write("Welcome! Use the sidebar to navigate through the app.")
 
 # ------------------ Goals Screen ------------------
 elif screen == "🎯 Goals":
@@ -93,11 +96,4 @@ elif screen == "🐢 Mascot":
         st.markdown("🐢 Turtle Mascot: 😊 Smiling and cheering you on!")
     else:
         st.success("🎉 Fantastic! You've reached your hydration goal!")
-        st.markdown("🐢 Turtle Mascot: 😄 Clapping with joy!")
-
-# ------------------ Summary Screen ------------------
-elif screen == "📅 Summary":
-    total = st.session_state.total_intake
-    st.subheader("📅 End-of-Day Summary")
-    st.balloons()
-    st.success(f"Today you drank {total} ml of water. Great job staying hydrated!")
+       
